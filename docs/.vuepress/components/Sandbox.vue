@@ -15,35 +15,35 @@
       <div class="list-item">
         <label for="multiple">
           <input id="multiple" type="checkbox" v-model="configuration.multiple">
-          <code>:multiple="{{ configuration.multiple ? 'true' : 'false' }}"</code>
+          <code>:multiple="{{ !!configuration.multiple }}"</code>
         </label>
       </div>
 
       <div class="list-item">
         <label for="disabled">
           <input id="disabled" type="checkbox" v-model="configuration.disabled">
-          <code>:disabled="{{ configuration.disabled ? 'true' : 'false' }}"</code>
+          <code>:disabled="{{ !!configuration.disabled }}"</code>
         </label>
       </div>
 
       <div class="list-item">
         <label for="clearable">
           <input id="clearable" type="checkbox" v-model="configuration.clearable">
-          <code>:clearable="{{ configuration.clearable ? 'true' : 'false' }}"</code>
+          <code>:clearable="{{ !!configuration.clearable }}"</code>
         </label>
       </div>
 
       <div class="list-item">
         <label for="searchable">
           <input id="searchable" type="checkbox" v-model="configuration.searchable">
-          <code>:searchable="{{ configuration.searchable ? 'true' : 'false' }}"</code>
+          <code>:searchable="{{ !!configuration.searchable }}"</code>
         </label>
       </div>
 
       <div class="list-item">
         <label for="filterable">
           <input id="filterable" type="checkbox" v-model="configuration.filterable">
-          <code>:filterable="{{ configuration.searchable ? 'true' : 'false' }}"</code>
+          <code>:filterable="{{ !!configuration.searchable }}"</code>
         </label>
       </div>
 
@@ -52,21 +52,21 @@
       <div class="list-item">
         <label for="taggable">
           <input id="taggable" type="checkbox" v-model="configuration.taggable">
-          <code>:taggable="{{ configuration.taggable ? 'true' : 'false' }}"</code>
+          <code>:taggable="{{ !!configuration.taggable }}"</code>
         </label>
       </div>
 
       <div class="list-item">
         <label for="noDrop">
           <input id="noDrop" type="checkbox" v-model="configuration.noDrop">
-          <code>:no-drop="{{ configuration.noDrop ? 'true' : 'false' }}"</code>
+          <code>:no-drop="{{ !!configuration.noDrop }}"</code>
         </label>
       </div>
 
       <div class="list-item">
         <label for="pushTags">
           <input id="pushTags" type="checkbox" v-model="configuration.pushTags">
-          <code>:push-tags="{{ configuration.pushTags ? 'true' : 'false' }}"</code>
+          <code>:push-tags="{{ !!configuration.pushTags }}"</code>
         </label>
       </div>
 
@@ -75,14 +75,21 @@
       <div class="list-item">
         <label for="selectOnTab">
           <input id="selectOnTab" type="checkbox" v-model="configuration.selectOnTab">
-          <code>:select-on-tab="{{ configuration.selectOnTab ? 'true' : 'false' }}"</code>
+          <code>:select-on-tab="{{ !!configuration.selectOnTab }}"</code>
         </label>
       </div>
 
       <div class="list-item">
         <label for="closeOnSelect">
           <input id="closeOnSelect" type="checkbox" v-model="configuration.closeOnSelect">
-          <code>:close-on-select="{{ configuration.closeOnSelect ? 'true' : 'false' }}"</code>
+          <code>:close-on-select="{{ !!configuration.closeOnSelect }}"</code>
+        </label>
+      </div>
+
+      <div class="list-item">
+        <label for="deselectByOption">
+          <input id="deselectByOption" type="checkbox" v-model="configuration.deselectByOption">
+          <code>:deselect-by-option="{{ !!configuration.deselectByOption }}"</code>
         </label>
       </div>
 
@@ -177,6 +184,7 @@ const defaultConfig = () => ({
   filterable: true,
   noDrop: false,
   closeOnSelect: true,
+  deselectByOption: false,
   disabled: false,
   selectOntab: false,
   placeholder: 'Select a Country...',
