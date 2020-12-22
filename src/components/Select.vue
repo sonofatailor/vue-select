@@ -61,7 +61,12 @@
           :key="getOptionKey(option)"
           :id="`vs${uid}__option-${index}`"
           class="vs__dropdown-option"
-          :class="{ 'vs__dropdown-option--selected': isOptionSelected(option), 'vs__dropdown-option--highlight': index === typeAheadPointer, 'vs__dropdown-option--disabled': !selectable(option) }"
+          :class="{
+            'vs__dropdown-option--deselect': isOptionDeselectable(option) && index === typeAheadPointer,
+            'vs__dropdown-option--selected': isOptionSelected(option),
+            'vs__dropdown-option--highlight': index === typeAheadPointer,
+            'vs__dropdown-option--disabled': !selectable(option)
+          }"
           :aria-selected="index === typeAheadPointer ? true : null"
           @mouseover="selectable(option) ? typeAheadPointer = index : null"
           @mousedown.prevent.stop="selectable(option) ? select(option) : null"
@@ -154,10 +159,11 @@
       },
 
       /**
-       * Can the user deselect an option by clicking it.
+       * Can the user deselect an option by clicking it from
+       * within the dropdown.
        * @type {Boolean}
        */
-      deselectByOption: {
+      deselectFromDropdown: {
         type: Boolean,
         default: false
       },
@@ -678,7 +684,7 @@
           }
           this.updateValue(option);
           this.$emit('option:selected', option);
-        } else if (this.deselectByOption && (this.clearable || this.multiple && this.val.length > 1)) {
+        } else if (this.deselectFromDropdown && (this.clearable || this.multiple && this.selectedValue.length > 1)) {
           this.deselect(option)
         }
         this.onAfterSelect(option)
@@ -784,6 +790,14 @@
        */
       isOptionSelected(option) {
         return this.selectedValue.some(value => this.optionComparator(value, option))
+      },
+
+      /**
+       *  Can the current option be removed via the dropdown?
+       *  Used to toggle the
+       */
+      isOptionDeselectable(option) {
+        return this.isOptionSelected(option) && this.deselectFromDropdown
       },
 
       /**
