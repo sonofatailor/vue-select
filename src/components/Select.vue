@@ -794,7 +794,6 @@
 
       /**
        *  Can the current option be removed via the dropdown?
-       *  Used to toggle the
        */
       isOptionDeselectable(option) {
         return this.isOptionSelected(option) && this.deselectFromDropdown
