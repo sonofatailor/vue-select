@@ -8,22 +8,24 @@
     <div :id="`vs${uid}__combobox`" ref="toggle" @mousedown="toggleDropdown($event)" class="vs__dropdown-toggle" role="combobox" :aria-expanded="dropdownOpen.toString()" :aria-owns="`vs${uid}__listbox`" aria-label="Search for option">
 
       <div class="vs__selected-options" ref="selectedOptions">
-        <slot v-for="option in selectedValue"
-              name="selected-option-container"
-              :option="normalizeOptionForSlot(option)"
-              :deselect="deselect"
-              :multiple="multiple"
-              :disabled="disabled">
-          <span :key="getOptionKey(option)" class="vs__selected">
-            <slot name="selected-option" v-bind="normalizeOptionForSlot(option)">
-              {{ getOptionLabel(option) }}
-            </slot>
-            <button v-if="multiple" :disabled="disabled" @click="deselect(option)" type="button" class="vs__deselect" :title="`Deselect ${getOptionLabel(option)}`" :aria-label="`Deselect ${getOptionLabel(option)}`" ref="deselectButtons">
-              <component :is="childComponents.Deselect" />
-            </button>
-          </span>
-        </slot>
-
+        <span class="vs__selected" v-if="customFieldLabel">{{ customFieldLabel }}</span>
+        <template v-else>
+          <slot v-for="option in selectedValue"
+                name="selected-option-container"
+                :option="normalizeOptionForSlot(option)"
+                :deselect="deselect"
+                :multiple="multiple"
+                :disabled="disabled">
+            <span :key="getOptionKey(option)" class="vs__selected">
+              <slot name="selected-option" v-bind="normalizeOptionForSlot(option)">
+                {{ getOptionLabel(option) }}
+              </slot>
+              <button v-if="multiple" :disabled="disabled" @click="deselect(option)" type="button" class="vs__deselect" :title="`Deselect ${getOptionLabel(option)}`" :aria-label="`Deselect ${getOptionLabel(option)}`" ref="deselectButtons">
+                <component :is="childComponents.Deselect" />
+              </button>
+            </span>
+          </slot>
+        </template>
         <slot name="search" v-bind="scope.search">
           <input class="vs__search" v-bind="scope.search.attributes" v-on="scope.search.events">
         </slot>
@@ -61,7 +63,12 @@
           :key="getOptionKey(option)"
           :id="`vs${uid}__option-${index}`"
           class="vs__dropdown-option"
-          :class="{ 'vs__dropdown-option--selected': isOptionSelected(option), 'vs__dropdown-option--highlight': index === typeAheadPointer, 'vs__dropdown-option--disabled': !selectable(option) }"
+          :class="{
+            'vs__dropdown-option--deselect': isOptionDeselectable(option) && index === typeAheadPointer,
+            'vs__dropdown-option--selected': isOptionSelected(option),
+            'vs__dropdown-option--highlight': index === typeAheadPointer,
+            'vs__dropdown-option--disabled': !selectable(option)
+          }"
           :aria-selected="index === typeAheadPointer ? true : null"
           @mouseover="selectable(option) ? typeAheadPointer = index : null"
           @mousedown.prevent.stop="selectable(option) ? select(option) : null"
@@ -105,7 +112,7 @@
        * Contains the currently selected value. Very similar to a
        * `value` attribute on an <input>. You can listen for changes
        * using 'change' event using v-on
-       * @type {Object||String||null}
+       * @type {Object||Array||String||null}
        */
       value: {},
 
@@ -154,6 +161,16 @@
       },
 
       /**
+       * Can the user deselect an option by clicking it from
+       * within the dropdown.
+       * @type {Boolean}
+       */
+      deselectFromDropdown: {
+        type: Boolean,
+        default: false
+      },
+
+      /**
        * Enable/disable filtering the options.
        * @type {Boolean}
        */
@@ -187,6 +204,15 @@
       transition: {
         type: String,
         default: 'vs__fade'
+      },
+
+      /**
+       * Optional custom field value to display in case of long or numerous values.
+       * @type {String}
+       */
+      customFieldLabel: {
+        type: String,
+        default: ''
       },
 
       /**
@@ -652,7 +678,9 @@
       },
 
       /**
-       * Select a given option.
+       * Select or deselect a given option.
+       *
+       * Allow deselect if clearable or if not the only selected option
        * @param  {Object|String} option
        * @return {void}
        */
@@ -667,6 +695,8 @@
           }
           this.updateValue(option);
           this.$emit('option:selected', option);
+        } else if (this.deselectFromDropdown && (this.clearable || this.multiple && this.selectedValue.length > 1)) {
+          this.deselect(option)
         }
         this.onAfterSelect(option)
       },
@@ -771,6 +801,13 @@
        */
       isOptionSelected(option) {
         return this.selectedValue.some(value => this.optionComparator(value, option))
+      },
+
+      /**
+       *  Can the current option be removed via the dropdown?
+       */
+      isOptionDeselectable(option) {
+        return this.isOptionSelected(option) && this.deselectFromDropdown
       },
 
       /**
@@ -1108,7 +1145,7 @@
       stateClasses() {
         return {
           'vs--open': this.dropdownOpen,
-          'vs--single': !this.multiple,
+          'vs--single': !this.multiple || this.customFieldLabel,
           'vs--searching': this.searching && !this.noDrop,
           'vs--searchable': this.searchable && !this.noDrop,
           'vs--unsearchable': !this.searchable,

@@ -1,3 +1,4 @@
+import Vue from "vue";
 import VueSelect from "../../src/components/Select";
 import { shallowMount } from "@vue/test-utils";
 import { selectWithProps } from "../helpers";
@@ -7,7 +8,7 @@ describe("Labels", () => {
     const Select = selectWithProps({
       options: [{ name: "Foo" }],
       label: "name",
-      value: { name: "Foo" }
+      value: { name: "Foo" },
     });
     expect(Select.find(".vs__selected").text()).toBe("Foo");
   });
@@ -15,7 +16,7 @@ describe("Labels", () => {
   it("will console.warn when options contain objects without a valid label key", async () => {
     const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
     const Select = selectWithProps({
-      options: [{}]
+      options: [{}],
     });
 
     Select.vm.open = true;
@@ -30,11 +31,11 @@ describe("Labels", () => {
   it("should display a placeholder if the value is empty", () => {
     const Select = shallowMount(VueSelect, {
       propsData: {
-        options: ["one"]
+        options: ["one"],
       },
       attrs: {
-        placeholder: "foo"
-      }
+        placeholder: "foo",
+      },
     });
 
     expect(Select.vm.searchPlaceholder).toEqual("foo");
@@ -42,15 +43,19 @@ describe("Labels", () => {
     expect(Select.vm.searchPlaceholder).not.toBeDefined();
   });
 
-  describe('getOptionLabel', () => {
-    it('will return undefined if the option lacks the label key', () => {
-      const getOptionLabel = VueSelect.props.getOptionLabel.default.bind({ label: 'label' });
-      expect(getOptionLabel({name: 'vue'})).toEqual(undefined);
+  describe("getOptionLabel", () => {
+    it("will return undefined if the option lacks the label key", () => {
+      const getOptionLabel = VueSelect.props.getOptionLabel.default.bind({
+        label: "label",
+      });
+      expect(getOptionLabel({ name: "vue" })).toEqual(undefined);
     });
 
-    it('will return a string value for a valid key', () => {
-      const getOptionLabel = VueSelect.props.getOptionLabel.default.bind({ label: 'label' });
-      expect(getOptionLabel({label: 'vue'})).toEqual('vue');
+    it("will return a string value for a valid key", () => {
+      const getOptionLabel = VueSelect.props.getOptionLabel.default.bind({
+        label: "label",
+      });
+      expect(getOptionLabel({ label: "vue" })).toEqual("vue");
     });
 
     /**
@@ -59,23 +64,37 @@ describe("Labels", () => {
      * @see https://github.com/vuejs/vue/issues/10224
      * @see https://github.com/vuejs/vue/pull/10229
      */
-    xit('will not call getOptionLabel if both scoped option slots are used and a filter is provided', () => {
-      const spy = spyOn(VueSelect.props.getOptionLabel, 'default');
+    xit("will not call getOptionLabel if both scoped option slots are used and a filter is provided", () => {
+      const spy = spyOn(VueSelect.props.getOptionLabel, "default");
       const Select = shallowMount(VueSelect, {
         propsData: {
-          options: [{name: 'one'}],
+          options: [{ name: "one" }],
           filter: () => {},
         },
         scopedSlots: {
-          'option': '<span class="option">{{ props.name }}</span>',
-          'selected-option': '<span class="selected">{{ props.name }}</span>',
+          option: '<span class="option">{{ props.name }}</span>',
+          "selected-option": '<span class="selected">{{ props.name }}</span>',
         },
       });
 
-      Select.vm.select({name: 'one'});
+      Select.vm.select({ name: "one" });
 
       expect(spy).toHaveBeenCalledTimes(0);
-      expect(Select.find('.selected').exists()).toBeTruthy();
+      expect(Select.find(".selected").exists()).toBeTruthy();
+    });
+
+    it("should display a custom placeholder instead of selected values", async () => {
+      const customFieldLabel = "2 selected";
+      const Select = shallowMount(VueSelect, {
+        propsData: {
+          customFieldLabel,
+          options: ["one", "two", "three"],
+        },
+      });
+
+      Select.vm.$data._value = ["one", "three"];
+      await Vue.nextTick();
+      expect(Select.find(".vs__selected").text()).toEqual(customFieldLabel);
     });
   });
 });
