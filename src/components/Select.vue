@@ -8,7 +8,11 @@
     <div :id="`vs${uid}__combobox`" ref="toggle" @mousedown="toggleDropdown($event)" class="vs__dropdown-toggle" role="combobox" :aria-expanded="dropdownOpen.toString()" :aria-owns="`vs${uid}__listbox`" aria-label="Search for option">
 
       <div class="vs__selected-options" ref="selectedOptions">
-        <span class="vs__selected" v-if="customFieldLabel">{{ customFieldLabel }}</span>
+        <span v-if="customFieldLabel" class="vs__selected vs_custom-field-label">
+          <slot name="custom-field-label" :customFieldLabel="customFieldLabel">
+            {{ customFieldLabel }}
+          </slot>
+        </span>
         <template v-else>
           <slot v-for="option in selectedValue"
                 name="selected-option-container"
