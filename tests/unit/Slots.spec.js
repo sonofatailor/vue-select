@@ -41,6 +41,21 @@ describe('Scoped Slots', () => {
       });
   });
 
+
+  describe('Slot: custom-field-label', () => {
+    it('receives customFieldLabel to the custom-field-label slot', () => {
+      const Select = mountDefault(
+        {value: 'one', customFieldLabel: 'custom label' },
+        {
+          scopedSlots: {
+            'custom-field-label': `<span class="test-slot-custom-field" slot="custom-field-label" slot-scope="{ customFieldLabel }">{{ customFieldLabel }}</span>`,
+          },
+        });
+
+      expect(Select.find('.test-slot-custom-field').text()).toEqual('custom label');
+    });
+  });
+
   it('receives an option object to the option slot in the dropdown menu',
     async () => {
       const Select = mountDefault(
