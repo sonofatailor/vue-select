@@ -44,4 +44,20 @@ describe("Moving the Typeahead Pointer", () => {
     Select.vm.typeAheadDown();
     expect(Select.vm.typeAheadPointer).toEqual(2);
   });
+
+  it("should deselect the pointer if all filtered items are not selectable", async () => {
+    const Select = shallowMount(VueSelect, {
+      propsData: {
+        options: ["disabled1", "selectable", "disabled2"], 
+        selectable: (o) => ["selectable"].includes(o),
+      },
+      sync: false
+    });
+
+    Select.vm.typeAheadPointer = 0;
+    Select.vm.search = "disabled"
+    await Select.vm.$nextTick();
+
+    expect(Select.vm.typeAheadPointer).toEqual(-1);
+  });
 });

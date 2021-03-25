@@ -7,11 +7,18 @@ export default {
 
   watch: {
     filteredOptions() {
+      let wasAnySelectable = false
+
       for (let i = 0; i < this.filteredOptions.length; i++) {
         if (this.selectable(this.filteredOptions[i])) {
           this.typeAheadPointer = i;
+          wasAnySelectable = true
           break;
         }
+      }
+
+      if (!wasAnySelectable) {
+        this.typeAheadPointer = -1;
       }
     }
   },
